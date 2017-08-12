@@ -19,4 +19,5 @@ public struct GoogleUserInstance {
     public var idToken: String
     public var accessToken: String
     public var serverToken: String?
+    public var scopes: [String]
 }

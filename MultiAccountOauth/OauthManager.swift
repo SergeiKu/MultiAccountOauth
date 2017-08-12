@@ -14,7 +14,7 @@ public class OauthManager: DynamicStorage {
     public static let sharedInstance = OauthManager()
     
     public var cliendId = ""
-    public var scope = [String]()
+//    public var scope = [String]() //remove?
     public var urlScheme = ""
     public var serverClientId: String?
     
@@ -24,12 +24,12 @@ public class OauthManager: DynamicStorage {
 
     dynamic var signinUsersRefreshToken = [String: String]()
     
-    public func configure(cliendId: String, scope: [String], urlScheme: String, serverCliendId: String?) {
+    public func configure(cliendId: String, urlScheme: String, serverCliendId: String?) {
         self.cliendId = cliendId
-        self.scope = scope
-        if scope.contains("profile") == false {
-            self.scope.append("profile")
-        }
+//        self.scope = scope
+//        if scope.contains("profile") == false {
+//            self.scope.append("profile")
+//        }
         if scope.contains("openid") == false {
             self.scope.append("openid")
         }
@@ -67,7 +67,7 @@ public class OauthManager: DynamicStorage {
         authenticatedUsers.removeAll()
     }
     
-    public func signin(controller: UIViewController, completion: ((_ success: Bool, _ user: GoogleUserInstance?, _ error: String?) -> ())?) {
+    public func signin(controller: UIViewController, scope: String, completion: ((_ success: Bool, _ user: GoogleUserInstance?, _ error: String?) -> ())?) {
         
         var audienceParam = [String: String]()
         if let serverClient = serverClientId {
