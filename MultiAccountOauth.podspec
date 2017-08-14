@@ -28,6 +28,7 @@ Pod::Spec.new do |s|
   s.dependency 'AppAuth', '~> 0.9.1'
   s.dependency 'SwiftyJSON', '~> 3.1.4'
   s.dependency 'Alamofire', '4.0.1'
+  s.dependency 'GTMAppAuth'
   s.source_files = 'MultiAccountOauth/*.swift'
 
 end

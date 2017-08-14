@@ -5,6 +5,7 @@
 //  Created by Kedan Li on 2017/6/17.
 //  Copyright © 2017年 Li Kedan. All rights reserved.
 //
+import GTMAppAuth
 
 public struct GoogleUserInstance {
 
@@ -19,5 +20,5 @@ public struct GoogleUserInstance {
     public var idToken: String
     public var accessToken: String
     public var serverToken: String?
-    public var scopes: [String]
+    public var authorization: GTMAppAuthFetcherAuthorization?
 }
