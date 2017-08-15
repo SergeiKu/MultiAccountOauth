@@ -45,17 +45,7 @@ public class OauthManager: DynamicStorage {
         }
         return nil
     }
-    
-//    public func userWithEmail(email: String) -> GoogleUserInstance? {
-//        for user in authenticatedUsers{
-//            if user.email == email {
-//                return user
-//            }
-//        }
-//        return nil
-//    }
-    
-    
+     
     
     public var redirectURL: String {
         return "\(urlScheme):/oauthredirect"
