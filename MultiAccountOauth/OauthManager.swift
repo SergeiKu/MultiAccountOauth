@@ -46,6 +46,17 @@ public class OauthManager: DynamicStorage {
         return nil
     }
     
+//    public func userWithEmail(email: String) -> GoogleUserInstance? {
+//        for user in authenticatedUsers{
+//            if user.email == email {
+//                return user
+//            }
+//        }
+//        return nil
+//    }
+    
+    
+    
     public var redirectURL: String {
         return "\(urlScheme):/oauthredirect"
     }
@@ -60,6 +71,10 @@ public class OauthManager: DynamicStorage {
             }
             index += 1
         }
+    }
+    
+    public func getAuthorizationObjectFor(userId: String) -> GTMAppAuthFetcherAuthorization? {
+        return GTMAppAuthFetcherAuthorization.init(fromKeychainForName: userId)
     }
     
     public func signOutAllUsers() {
@@ -82,11 +97,11 @@ public class OauthManager: DynamicStorage {
                 let serverToken = state?.lastTokenResponse?.additionalParameters?["server_code"] as? String
                 let accessToken = state?.value(forKey: "accessToken")! as! String
                 let authorization = GTMAppAuthFetcherAuthorization(authState: state!)
-                print("DOC-2238 state is \(Mirror(reflecting: state!))")
                 ExternalRequest.sendExternalRequest(url: "https://www.googleapis.com/oauth2/v2/userinfo", method: .get, param: ["access_token": accessToken as AnyObject, "alt": "json" as AnyObject], completion: { (json) in
                     if json["error"] == JSON.null {
                         self.signinUsersRefreshToken[json["id"].stringValue] = refreshToken!
-                        let instance = GoogleUserInstance(email: json["email"].stringValue, name: json["name"].stringValue, familyName: json["family_name"].stringValue, firstName: json["given_name"].stringValue, locale: json["locale"].stringValue, id: json["id"].stringValue, profile: json["picture"].stringValue, refreshToken: refreshToken!, idToken: idToken, accessToken: accessToken, serverToken: serverToken, authorization: authorization)
+                        let instance = GoogleUserInstance(email: json["email"].stringValue, name: json["name"].stringValue, familyName: json["family_name"].stringValue, firstName: json["given_name"].stringValue, locale: json["locale"].stringValue, id: json["id"].stringValue, profile: json["picture"].stringValue, refreshToken: refreshToken!, idToken: idToken, accessToken: accessToken, serverToken: serverToken)
+                        GTMAppAuthFetcherAuthorization.save(authorization, toKeychainForName: instance.id)
                         if self.userWithId(id: instance.id) == nil {
                             self.authenticatedUsers.append(instance)
                         }
@@ -123,7 +138,7 @@ public class OauthManager: DynamicStorage {
                 ExternalRequest.sendExternalRequest(url: "https://www.googleapis.com/oauth2/v2/userinfo", method: .get, param: ["access_token": access_token as AnyObject, "alt": "json" as AnyObject], completion: { (json) in
                     if json["error"] == JSON.null {
                         self.signinUsersRefreshToken[json["id"].stringValue] = refresh_token
-                        let instance = GoogleUserInstance(email: json["email"].stringValue, name: json["name"].stringValue, familyName: json["family_name"].stringValue, firstName: json["given_name"].stringValue, locale: json["locale"].stringValue, id: json["id"].stringValue, profile: json["picture"].stringValue, refreshToken: refresh_token, idToken: id_token, accessToken: access_token, serverToken: nil, authorization: nil)
+                        let instance = GoogleUserInstance(email: json["email"].stringValue, name: json["name"].stringValue, familyName: json["family_name"].stringValue, firstName: json["given_name"].stringValue, locale: json["locale"].stringValue, id: json["id"].stringValue, profile: json["picture"].stringValue, refreshToken: refresh_token, idToken: id_token, accessToken: access_token, serverToken: nil)
                         if self.userWithId(id: instance.id) == nil {
                             self.authenticatedUsers.append(instance)
                         }
