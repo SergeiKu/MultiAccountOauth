@@ -10,6 +10,11 @@ import GTMAppAuth
 import SwiftyJSON
 
 public class OauthManager: DynamicStorage {
+    
+    enum AccessType:String {
+        case online = "online"
+        case offline = "offline"
+    }
 
     public static let sharedInstance = OauthManager()
     
@@ -17,6 +22,7 @@ public class OauthManager: DynamicStorage {
     public var scope = [String]()
     public var urlScheme = ""
     public var serverClientId: String?
+    public var accessType:AccessType!
     
     public var authenticatedUsers = [GoogleUserInstance]()
     
@@ -24,7 +30,7 @@ public class OauthManager: DynamicStorage {
 
     dynamic var signinUsersRefreshToken = [String: String]()
     
-    public func configure(cliendId: String, scope: [String], urlScheme: String, serverCliendId: String?) {
+    public func configure(cliendId: String, scope: [String], urlScheme: String, serverCliendId: String?, accessType:AccessType = .online) {
         self.cliendId = cliendId
         self.scope = scope
         if scope.contains("profile") == false {
@@ -33,8 +39,10 @@ public class OauthManager: DynamicStorage {
         if scope.contains("openid") == false {
             self.scope.append("openid")
         }
+        
         self.urlScheme = urlScheme
         self.serverClientId = serverCliendId
+        self.accessType = accessType
     }
     
     public func userWithId(id: String) -> GoogleUserInstance? {
@@ -85,6 +93,9 @@ public class OauthManager: DynamicStorage {
         var audienceParam = [String: String]()
         if let serverClient = serverClientId {
             audienceParam["audience"] = serverClient
+        }
+        if self.accessType == AccessType.offline {
+            audienceParam["access_type"] = AccessType.offline.rawValue
         }
         let request = OIDAuthorizationRequest(configuration: getConfiguration(), clientId: cliendId, scopes: scope, redirectURL: URL(string: redirectURL)!, responseType: OIDResponseTypeCode, additionalParameters: audienceParam)
         
