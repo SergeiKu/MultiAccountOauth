@@ -9,7 +9,7 @@
 import GTMAppAuth
 import SwiftyJSON
 
-enum OAuthAccessType:String {
+public enum OAuthAccessType:String {
     case online = "online"
     case offline = "offline"
 }
