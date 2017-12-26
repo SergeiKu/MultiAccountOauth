@@ -43,7 +43,7 @@ class InfoTableViewCell: UITableViewCell {
     func getUserLabel(name: String) -> UIImage {
         
         let color = RandomColorSwift.randomColor(hue: .value(email.hashValue % 360) , luminosity: .dark)
-        return textToImage(char: "\(name.characters.first!)".uppercased(), size: CGSize(width: 200, height: 200), ratio: 0.6, bgColor: color)
+        return textToImage(char: "\(name.first!)".uppercased(), size: CGSize(width: 200, height: 200), ratio: 0.6, bgColor: color)
 
     }
  
