@@ -13,9 +13,9 @@ PODS:
     - Alamofire (= 4.5.1)
     - AppAuth (~> 0.9.1)
     - GTMAppAuth
-    - SwiftyJSON (~> 3.1.4)
+    - SwiftyJSON (~> 4.0.0)
   - RandomColorSwift (1.0.0)
-  - SwiftyJSON (3.1.4)
+  - SwiftyJSON (4.0.0)
 
 DEPENDENCIES:
   - MultiAccountOAuth (from `../`)
@@ -30,9 +30,9 @@ SPEC CHECKSUMS:
   AppAuth: f7d9a2ce4ffe79a62a8b0c1d0938e88d9809b846
   GTMAppAuth: ae710e1e53431e2bcdd57f9f92daa16a58a2947d
   GTMSessionFetcher: ebaa1f79a5366922c1735f1566901f50beba23b7
-  MultiAccountOAuth: 92a3db2f2688f261d371da08299f4bcd450b7882
+  MultiAccountOAuth: 34434574f3a3520e29060c6adec9e9518e7c00fa
   RandomColorSwift: 9f85058b721665d52d239ca166a913e083506444
-  SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
+  SwiftyJSON: 070dabdcb1beb81b247c65ffa3a79dbbfb3b48aa
 
 PODFILE CHECKSUM: 6d150c46156a0dcf369bf70e112a5e10af4c9ad6
 
