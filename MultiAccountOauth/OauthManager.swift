@@ -6,8 +6,13 @@
 //  Copyright © 2017年 Li Kedan. All rights reserved.
 //
 
-import AppAuth
+import GTMAppAuth
 import SwiftyJSON
+
+public enum OAuthAccessType:String {
+    case online = "online"
+    case offline = "offline"
+}
 
 public class OauthManager: DynamicStorage {
 
@@ -17,14 +22,15 @@ public class OauthManager: DynamicStorage {
     public var scope = [String]()
     public var urlScheme = ""
     public var serverClientId: String?
+    public var accessType:OAuthAccessType!
     
     public var authenticatedUsers = [GoogleUserInstance]()
     
     public var oauthSession: OIDAuthorizationFlowSession?
 
-    dynamic var signinUsersRefreshToken = [String: String]()
+    @objc dynamic var signinUsersRefreshToken = [String: String]()
     
-    public func configure(cliendId: String, scope: [String], urlScheme: String, serverCliendId: String?) {
+    public func configure(cliendId: String, scope: [String], urlScheme: String, serverCliendId: String?, accessType:OAuthAccessType = .online) {
         self.cliendId = cliendId
         self.scope = scope
         if scope.contains("profile") == false {
@@ -33,13 +39,24 @@ public class OauthManager: DynamicStorage {
         if scope.contains("openid") == false {
             self.scope.append("openid")
         }
+        
         self.urlScheme = urlScheme
         self.serverClientId = serverCliendId
+        self.accessType = accessType
     }
     
     public func userWithId(id: String) -> GoogleUserInstance? {
         for user in authenticatedUsers{
             if user.id == id {
+                return user
+            }
+        }
+        return nil
+    }
+    
+    public func userForEmail(_ email: String) -> GoogleUserInstance? {
+        for user in authenticatedUsers{
+            if user.email == email {
                 return user
             }
         }
@@ -62,6 +79,10 @@ public class OauthManager: DynamicStorage {
         }
     }
     
+    public func getAuthorizationObjectFor(userId: String) -> GTMAppAuthFetcherAuthorization? {
+        return GTMAppAuthFetcherAuthorization.init(fromKeychainForName: userId)
+    }
+    
     public func signOutAllUsers() {
         signinUsersRefreshToken.removeAll()
         authenticatedUsers.removeAll()
@@ -73,6 +94,9 @@ public class OauthManager: DynamicStorage {
         if let serverClient = serverClientId {
             audienceParam["audience"] = serverClient
         }
+        if self.accessType == OAuthAccessType.offline {
+            audienceParam["access_type"] = OAuthAccessType.offline.rawValue
+        }
         let request = OIDAuthorizationRequest(configuration: getConfiguration(), clientId: cliendId, scopes: scope, redirectURL: URL(string: redirectURL)!, responseType: OIDResponseTypeCode, additionalParameters: audienceParam)
         
         oauthSession = OIDAuthState.authState(byPresenting: request, presenting: controller) { (state, error) in
@@ -81,10 +105,12 @@ public class OauthManager: DynamicStorage {
                 let refreshToken = state?.refreshToken!
                 let serverToken = state?.lastTokenResponse?.additionalParameters?["server_code"] as? String
                 let accessToken = state?.value(forKey: "accessToken")! as! String
+                let authorization = GTMAppAuthFetcherAuthorization(authState: state!)
                 ExternalRequest.sendExternalRequest(url: "https://www.googleapis.com/oauth2/v2/userinfo", method: .get, param: ["access_token": accessToken as AnyObject, "alt": "json" as AnyObject], completion: { (json) in
                     if json["error"] == JSON.null {
                         self.signinUsersRefreshToken[json["id"].stringValue] = refreshToken!
                         let instance = GoogleUserInstance(email: json["email"].stringValue, name: json["name"].stringValue, familyName: json["family_name"].stringValue, firstName: json["given_name"].stringValue, locale: json["locale"].stringValue, id: json["id"].stringValue, profile: json["picture"].stringValue, refreshToken: refreshToken!, idToken: idToken, accessToken: accessToken, serverToken: serverToken)
+                        GTMAppAuthFetcherAuthorization.save(authorization, toKeychainForName: instance.id)
                         if self.userWithId(id: instance.id) == nil {
                             self.authenticatedUsers.append(instance)
                         }
