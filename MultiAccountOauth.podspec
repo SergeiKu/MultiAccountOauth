@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
   s.platform     = :ios, '9.0'
   s.requires_arc = true
   s.dependency 'AppAuth', '~> 0.9.1'
-  s.dependency 'SwiftyJSON', '~> 3.1.4'
+  s.dependency 'SwiftyJSON', '~> 4.0.0'
   s.dependency 'Alamofire', '~> 4.0.1'
   s.source_files = 'MultiAccountOauth/*.swift'
 
